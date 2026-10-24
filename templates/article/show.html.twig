@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.titre }} — Blog Ostéopathie{% endblock %}
+
+{% block body %}
+    <article class="max-w-3xl mx-auto">
+        {# ═ En-tête de l'article ═ #}
+        <header class="mb-8 pb-8 border-b border-sepia/30">
+            <p class="text-sm uppercase tracking-wider text-sepia font-semibold mb-3">
+                {{ article.categorie.nom }}
+            </p>
+
+            <h1 class="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                {{ article.titre }}
+            </h1>
+
+            <div class="flex gap-4 text-sm text-sepia">
+                <span>Publié le {{ article.datePublication|date('d F Y') }}</span>
+                <span>•</span>
+                <span>Par {{ article.auteur.email|split('@')[0] }}</span>
+            </div>
+        </header>
+
+        {# ═ Image principale (si définie) ═ #}
+        {% if article.imagePrincipale %}
+            <img src="{{ article.imagePrincipale }}" 
+                 alt="{{ article.titre }}"
+                 class="w-full h-64 object-cover rounded-lg mb-8">
+        {% endif %}
+
+        {# ═ Contenu de l'article:
+             |raw car le contenu stocké en BDD contient du HTML (via EasyAdmin plus tard) Sans échappement : à bien contrôler côté admin (risque XSS)═ #}
+        <div class="prose prose-lg max-w-none dark:prose-invert leading-relaxed space-y-4">
+            {{ article.contenu|raw }}
+        </div>
+
+        {# ═ Commentaires validés ═ #}
+        <section class="mt-12 pt-8 border-t border-sepia/30">
+            <h2 class="font-serif text-2xl font-bold mb-6">
+                {{ commentaires|length }} 
+                commentaire{{ commentaires|length > 1 ? 's' : '' }}
+            </h2>
+
+            {% if commentaires is empty %}
+                <p class="text-sepia italic text-sm">
+                    Aucun commentaire pour l'instant. Soyez le premier à réagir !
+                </p>
+            {% else %}
+                <ul class="space-y-6">
+                    {% for commentaire in commentaires %}
+                        <li class="bg-white dark:bg-encre/50 rounded-lg p-5 border border-sepia/20">
+                            {# En-tête : auteur + date #}
+                            <header class="flex justify-between items-center mb-3 text-sm">
+                                <span class="font-semibold">
+                                    {{ commentaire.auteur.email|split('@')[0] }}
+                                </span>
+                                <span class="text-sepia text-xs">
+                                    {{ commentaire.dateCreation|date('d/m/Y à H:i') }}
+                                </span>
+                            </header>
+
+                            {# Contenu du commentaire #}
+                            <p class="text-sm leading-relaxed">
+                                {{ commentaire.contenu }}
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {# Note sur l'ajout d'un commentaire — on en fera un vrai formulaire demain #}
+            <p class="mt-6 text-xs text-sepia italic text-center">
+                💡 La possibilité de déposer un commentaire sera ajoutée prochainement.
+            </p>
+        </section>
+
+        {# ═ Retour à la liste═ #}
+        <footer class="mt-12 pt-8 border-t border-sepia/30">
+            <a href="{{ path('app_article_index') }}" 
+               class="inline-flex items-center gap-2 text-sepia hover:text-encre dark:hover:text-parchment transition-colors">
+                ← Retour à la liste des articles
+            </a>
+        </footer>
+    </article>
+{% endblock %}

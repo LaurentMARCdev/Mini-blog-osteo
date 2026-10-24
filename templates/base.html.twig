@@ -1,24 +1,127 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+    {# 
+        Titre dynamique : chaque page peut surcharger le bloc "title".
+        Le "|default" affiche "Blog Ostéopathie" si aucune page ne définit le bloc. 
+    #}
+    <title>{% block title %}Blog Ostéopathie{% endblock %}</title>
+    {# Mise en place du script d'un bouton pour choisir le mode d'affichage clair/obscur #}
+    <script>
+        (function () {
+            // On stocke le choix sous la clé 'theme' avec valeur 'dark' ou 'light'
+            const choixSauvegarde = localStorage.getItem('theme');
+            const prefereSombre = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
+            // Si l'utilisateur a déjà cliqué : on respecte son choix
+            // Sinon : on applique le choix du système
+            const doitEtreSombre = choixSauvegarde === 'dark' 
+                            || (choixSauvegarde === null && prefereSombre);
+
+            if (doitEtreSombre) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+
+    {# 
+        Tailwind CDN : solution rapide pour prototyper. En production je migrerai vers AssetMapper ou Encore avec un build local.
+    #}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {# 
+        Config Tailwind : on étend la palette avec des couleurs sobres,
+        adaptées à un blog d'histoire (teintes sépia + bleu nuit).
+    #}
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        sepia:    '#8B6F47',  // brun sépia pour les accents
+                        parchment:'#F7F3EC',  // fond clair style parchemin
+                        encre:    '#1B2838',  // bleu nuit style encre
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'serif'],   // pour les titres (côté classique)
+                        sans:  ['system-ui', 'sans-serif'], // pour le corps
+                    },
+                },
+            },
+        }
+    </script>
+
+    {# 
+        Bloc pour permettre à chaque page d'ajouter des styles ou scripts
+        spécifiques (ex : page détail d'article avec table des matières).
+    #}
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col bg-parchment text-encre dark:bg-encre dark:text-parchment font-sans transition-colors">
+
+    {# ═ HEADER (navigation) ═ #}
+    <header class="border-b border-sepia/20 dark:border-sepia/40 bg-parchment/80 dark:bg-encre/80 backdrop-blur-sm sticky top-0 z-10">
+        <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            {# Logo / titre du blog : lien vers l'accueil #}
+            <a href="{{ path('app_home') }}" class="font-serif text-2xl font-bold hover:text-sepia transition-colors">
+                Blog Ostéopathie
+            </a>
+            <ul class="flex gap-6 text-sm font-medium items-center">
+                <li><a href="{{ path('app_home') }}" class="hover:text-sepia transition-colors">Accueil</a></li>
+                <li><a href="{{ path('app_article_index') }}" class="hover:text-sepia transition-colors">Articles</a></li>
+                
+                {# Toggle dark mode #}
+                <li>
+                    <button type="button" 
+                            id="toggle-theme"
+                            class="p-2 rounded-full hover:bg-sepia/10 transition-colors"
+                            aria-label="Basculer entre mode clair et sombre"
+                            title="Basculer le thème">
+                        {# Icône soleil (visible en mode sombre pour revenir au clair) #}
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        
+                        {# Icône lune (visible en mode clair pour passer au sombre) #}
+                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    {# ═  CONTENU PRINCIPAL (chaque page remplit ici) ═ #}
+    <main class="flex-grow max-w-5xl mx-auto px-6 py-10 w-full">
         {% block body %}{% endblock %}
-    </body>
+    </main>
+
+    {# ═ FOOTER ═ #}
+    <footer class="border-t border-sepia/20 dark:border-sepia/40 py-6 text-center text-sm text-sepia">
+        <p>&copy; {{ 'now'|date('Y') }} Blog Ostéopathie — Projet DWWM</p>
+    </footer>
+
+    {# Bloc pour ajouter des scripts spécifiques à certaines pages #}
+    {% block javascripts %}
+    <script>
+        // Toggle dark mode : clic sur le bouton = inversion + sauvegarde
+        document.getElementById('toggle-theme').addEventListener('click', function () {
+            // On ajoute/retire la classe 'dark' sur <html>
+            const estSombreMaintenant = document.documentElement.classList.toggle('dark');
+            
+            // On sauvegarde le choix en localStorage pour le prochain chargement
+            localStorage.setItem('theme', estSombreMaintenant ? 'dark' : 'light');
+        });
+    </script>
+    {% endblock %}
+</body>
 </html>

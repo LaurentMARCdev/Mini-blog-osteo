@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tous les articles — Blog Ostéopathie{% endblock %}
+
+{% block body %}
+    <header class="mb-10 text-center">
+        <h1 class="font-serif text-4xl font-bold mb-3">
+            Tous les articles
+        </h1>
+        <p class="text-sepia">
+            {{ articles|length }} article{{ articles|length > 1 ? 's' : '' }} publié{{ articles|length > 1 ? 's' : '' }}
+        </p>
+    </header>
+
+    {% if articles is empty %}
+        <p class="text-center text-sepia italic py-12">
+            Aucun article publié pour le moment.
+        </p>
+    {% else %}
+        {# Liste verticale (plus lisible que la grille 3-colonnes pour une liste complète) #}
+        <div class="space-y-6">
+            {% for article in articles %}
+                <article class="bg-white dark:bg-encre/50 rounded-lg p-6 border border-sepia/20 hover:border-sepia transition-colors">
+                    <p class="text-xs uppercase tracking-wider text-sepia font-semibold mb-2">
+                        {{ article.categorie.nom }}
+                    </p>
+
+                    <h2 class="font-serif text-2xl font-bold mb-2 leading-tight">
+                        <a href="{{ path('app_article_show', { slug: article.slug }) }}"
+                           class="hover:text-sepia transition-colors">
+                            {{ article.titre }}
+                        </a>
+                    </h2>
+
+                    <p class="text-sm leading-relaxed mb-3">
+                        {{ article.extrait }}
+                    </p>
+
+                    <footer class="text-xs text-sepia flex gap-4">
+                        <span>📅 {{ article.datePublication|date('d F Y') }}</span>
+                        <span>✍️ Par {{ article.auteur.email|split('@')[0] }}</span>
+                    </footer>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

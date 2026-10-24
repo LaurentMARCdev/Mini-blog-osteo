@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil — Blog Ostéopathie{% endblock %}
+
+{% block body %}
+    {#    = Hero : accroche du blog ═ #}
+    <section class="text-center mb-16">
+        <h1 class="font-serif text-5xl font-bold mb-4">
+            Histoire de l'ostéopathie
+        </h1>
+        <p class="text-lg text-sepia max-w-2xl mx-auto">
+            Un espace de partage dédié aux origines, aux figures marquantes
+            et à l'évolution de la discipline ostéopathique.
+        </p>
+    </section>
+
+    {# ═ Derniers articles ═ #}
+    <section>
+        <h2 class="font-serif text-3xl font-bold mb-8 border-b border-sepia/30 pb-2">
+            Derniers articles
+        </h2>
+
+        {# Si pas d'articles : message, sinon la grille #}
+        {% if articles is empty %}
+            <p class="text-center text-sepia italic py-12">
+                Aucun article publié pour le moment.
+            </p>
+        {% else %}
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for article in articles %}
+                    <article class="bg-white dark:bg-encre/50 rounded-lg p-6 border border-sepia/20 hover:border-sepia transition-colors flex flex-col">
+                        {# Catégorie (petit badge) #}
+                        <p class="text-xs uppercase tracking-wider text-sepia font-semibold mb-2">
+                            {{ article.categorie.nom }}
+                        </p>
+
+                        {# Titre cliquable #}
+                        <h3 class="font-serif text-xl font-bold mb-3 leading-tight">
+                            <a href="{{ path('app_article_show', { slug: article.slug }) }}" 
+                               class="hover:text-sepia transition-colors">
+                                {{ article.titre }}
+                            </a>
+                        </h3>
+
+                        {# Extrait #}
+                        <p class="text-sm leading-relaxed mb-4 flex-grow">
+                            {{ article.extrait }}
+                        </p>
+
+                        {# Pied de carte : date + auteur #}
+                        <footer class="text-xs text-sepia pt-3 border-t border-sepia/20 flex justify-between">
+                            <span>{{ article.datePublication|date('d/m/Y') }}</span>
+                            <span>Par {{ article.auteur.email|split('@')[0] }}</span>
+                        </footer>
+                    </article>
+                {% endfor %}
+            </div>
+
+            {# Lien vers la liste complète #}
+            <div class="text-center mt-10">
+                <a href="{{ path('app_article_index') }}" 
+                   class="inline-block px-6 py-3 bg-sepia text-white rounded hover:bg-encre transition-colors font-medium">
+                    Voir tous les articles →
+                </a>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}
