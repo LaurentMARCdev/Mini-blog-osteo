@@ -68,10 +68,51 @@
                 </ul>
             {% endif %}
 
-            {# Note sur l'ajout d'un commentaire — on en fera un vrai formulaire demain #}
-            <p class="mt-6 text-xs text-sepia italic text-center">
-                💡 La possibilité de déposer un commentaire sera ajoutée prochainement.
-            </p>
+            {# ═ Formulaire de dépôt de commentaire visible uniquement pour les utilisateurs connectés.Pour les anonymes, on affiche un appel à l'inscription. ═ #}
+            {% if app.user %}
+                {# Flash messages affichés après soumission réussie #}
+                {% for message in app.flashes('success') %}
+                    <div class="mb-4 p-4 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-lg text-sm" role="status">
+                        ✅ {{ message }}
+                    </div>
+                {% endfor %}
+
+                <div class="mt-8 bg-white dark:bg-encre/50 rounded-lg p-6 border border-sepia/20">
+                    <h3 class="font-serif text-xl font-bold mb-4">
+                        Laisser un commentaire
+                    </h3>
+
+                    {# Rappel : commentaireForm est passé depuis le controller #}
+                    {{ form_start(commentaireForm) }}
+                        {{ form_row(commentaireForm.contenu) }}
+
+                        <div class="flex justify-between items-center mt-4">
+                            <p class="text-xs text-sepia italic">
+                                Votre commentaire sera publié après validation de la modération.
+                            </p>
+                            <button type="submit" class="bg-sepia hover:bg-encre text-white font-medium px-6 py-2 rounded transition-colors">
+                                Publier
+                            </button>
+                        </div>
+                    {{ form_end(commentaireForm) }}
+                </div>
+            {% else %}
+                {# Utilisateur anonyme : invitation à se connecter/inscrire #}
+                <div class="mt-8 bg-parchment dark:bg-encre/30 rounded-lg p-6 border border-sepia/30 text-center">
+                    <p class="text-sm text-sepia mb-3">
+                        💬 Pour laisser un commentaire, vous devez avoir un compte.
+                    </p>
+                    <div class="flex gap-3 justify-center text-sm">
+                        <a href="{{ path('app_login') }}" class="font-medium underline hover:text-encre dark:hover:text-parchment transition-colors">
+                            Se connecter
+                        </a>
+                        <span class="text-sepia">ou</span>
+                        <a href="{{ path('app_register') }}" class="font-medium underline hover:text-encre dark:hover:text-parchment transition-colors">
+                            Créer un compte
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
         </section>
 
         {# ═ Retour à la liste═ #}

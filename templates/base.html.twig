@@ -72,24 +72,51 @@
             <a href="{{ path('app_home') }}" class="font-serif text-2xl font-bold hover:text-sepia transition-colors">
                 Blog Ostéopathie
             </a>
-            <ul class="flex gap-6 text-sm font-medium items-center">
+           <ul class="flex gap-6 text-sm font-medium items-center">
                 <li><a href="{{ path('app_home') }}" class="hover:text-sepia transition-colors">Accueil</a></li>
                 <li><a href="{{ path('app_article_index') }}" class="hover:text-sepia transition-colors">Articles</a></li>
-                
-                {# Toggle dark mode #}
+
+                {# ═ Menu utilisateur : varie selon la connexion app.user existe quand l'utilisateur est authentifié ═ #}
+                {% if app.user %}
+                    {# Utilisateur connecté : nom + lien de déconnexion #}
+                    <li class="text-sepia hidden md:inline">
+                        <span title="{{ app.user.userIdentifier }}">
+                            👤 {{ app.user.userIdentifier|split('@')[0] }}
+                        </span>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_logout') }}" 
+                        class="hover:text-sepia transition-colors"
+                        title="Se déconnecter">
+                            Déconnexion
+                        </a>
+                    </li>
+                {% else %}
+                    {# Utilisateur anonyme : liens Connexion + Inscription #}
+                    <li>
+                        <a href="{{ path('app_login') }}" class="hover:text-sepia transition-colors">
+                            Connexion
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_register') }}" 
+                        class="px-3 py-1 bg-sepia text-white rounded hover:bg-encre transition-colors">
+                            Inscription
+                        </a>
+                    </li>
+                {% endif %}
+
+                {# Toggle dark mode (reste identique) #}
                 <li>
                     <button type="button" 
                             id="toggle-theme"
                             class="p-2 rounded-full hover:bg-sepia/10 transition-colors"
                             aria-label="Basculer entre mode clair et sombre"
                             title="Basculer le thème">
-                        {# Icône soleil (visible en mode sombre pour revenir au clair) #}
                         <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
-                        
-                        {# Icône lune (visible en mode clair pour passer au sombre) #}
                         <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>

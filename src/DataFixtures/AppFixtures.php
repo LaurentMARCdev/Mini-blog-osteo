@@ -48,7 +48,7 @@ class AppFixtures extends Fixture
 
         $admin = new User();
         $admin->setEmail('admin@blog-osteo.test');
-        $admin->setRoles(['ROLE-ADMIN']);
+        $admin->setRoles(['ROLE_ADMIN']);
         // Hashage du mdp avec l'algo configuré dans security.yaml
         $admin->setPassword($this->hasher->hashPassword($admin, 'admin123'));
         $manager->persist($admin);

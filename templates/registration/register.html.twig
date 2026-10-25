@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription — Blog Ostéopathie{% endblock %}
+
+{% block body %}
+    <div class="max-w-md mx-auto">
+        {# ═ En-tête ═ #}
+        <header class="mb-8 text-center">
+            <h1 class="font-serif text-3xl font-bold mb-2">
+                Créer un compte
+            </h1>
+            <p class="text-sepia text-sm">
+                Rejoignez la communauté pour commenter les articles.
+            </p>
+        </header>
+
+        {# ═ Formulaire géré par RegistrationFormType => form_start et form_end ouvrent/ferment la balise <form>
+             form_row rend chaque champ avec label + input + erreurs & les classes CSS Tailwind sont définies dans RegistrationFormType.php ═ #}
+
+        {{ form_start(registrationForm, { 
+            attr: { 
+                class: 'space-y-4 bg-white dark:bg-encre/50 p-8 rounded-lg border border-sepia/20' 
+            } 
+        }) }}
+
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.plainPassword) }}
+            {{ form_row(registrationForm.agreeTerms) }}
+
+            <button type="submit" class="w-full bg-sepia hover:bg-encre text-white font-medium py-3 rounded transition-colors mt-6">
+                Créer mon compte
+            </button>
+
+        {{ form_end(registrationForm) }}
+
+        {# ═ Lien vers la connexion si déjà inscrit═ #}
+
+
+        <p class="text-center mt-6 text-sm text-sepia">
+            Déjà un compte ?
+            <a href="{{ path('app_login') }}" class="font-medium underline hover:text-encre dark:hover:text-parchment transition-colors">
+                Se connecter
+            </a>
+        </p>
+    </div>
+{% endblock %}
