@@ -7,6 +7,7 @@ use App\Entity\Comment;
 use App\Form\CommentFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ArticleRepository;
+use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,12 +26,17 @@ class ArticleController extends AbstractController
      * Liste tous les articles publiés findAllPublished, triés du plus récent au plus ancien.
      */
     #[Route('/articles', name: 'app_article_index')]
-    public function index(ArticleRepository $articleRepository): Response
-    {
+    public function index(
+        ArticleRepository $articleRepository,
+        CategoryRepository $categoryRepository,
+        ): Response {
+
         $articles = $articleRepository->findAllPublished();
+        $categories = $categoryRepository->findAll();
 
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
+            'categories' => $categories,
         ]);
     }
 

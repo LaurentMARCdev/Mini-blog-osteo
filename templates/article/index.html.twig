@@ -17,10 +17,31 @@
             Aucun article publié pour le moment.
         </p>
     {% else %}
+        {# ═ Filtre par catégorie (côté client, sans rechargement) ═ #}
+        <div class="mb-6 flex flex-wrap items-center gap-4 justify-between">
+            <div class="flex items-center gap-3">
+                <label for="filtre-category" class="font-semibold text-sm">
+                    Filtrer par catégorie :
+                </label>
+                <select id="filtre-category"
+                        onchange="filtrerArticles(this.value)"
+                        class="border border-sepia/40 bg-parchment dark:bg-encre dark:text-parchment rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-sepia">
+                    <option value="">Toutes les catégories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p id="compteur-articles" class="text-sm text-sepia italic"
+               role="status" aria-live="polite">
+                {{ articles|length }} article{{ articles|length > 1 ? 's' : '' }} affiché{{ articles|length > 1 ? 's' : '' }}
+            </p>
+        </div>
         {# Liste verticale (plus lisible que la grille 3-colonnes pour une liste complète) #}
         <div class="space-y-6">
             {% for article in articles %}
-                <article class="bg-white dark:bg-encre/50 rounded-lg p-6 border border-sepia/20 hover:border-sepia transition-colors">
+                <article data-category-id = "{{ article.categorie.id }}"
+                         class="bg-white dark:bg-encre/50 rounded-lg p-6 border border-sepia/20 hover:border-sepia transition-colors">
                     <p class="text-xs uppercase tracking-wider text-sepia font-semibold mb-2">
                         {{ article.categorie.nom }}
                     </p>
@@ -42,6 +63,44 @@
                     </footer>
                 </article>
             {% endfor %}
+            {# Message affiché par le JS si aucun article ne correspond au filtre #}
+            <p id="aucun-resultat" class="hidden text-center text-sepia italic py-12">
+                Aucun article dans cette catégorie.
+            </p>
         </div>
     {% endif %}
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        /**
+         * Filtre les articles affichés selon la catégorie sélectionnée.
+         * Pur DOM, pas de rechargement ni d'appel API : toutes les cartes
+         * sont déjà présentes dans la page, on les affiche/masque juste.
+         *
+         * @param {string} categoryId - L'id de la catégorie, ou "" pour tout afficher
+         */
+        function filtrerArticles(categoryId) {
+            const articles = document.querySelectorAll('[data-category-id]');
+            let visibles = 0;
+
+            articles.forEach(article => {
+                // Si pas de filtre OU si l'article correspond à la catégorie choisie
+                const estVisible = !categoryId || article.dataset.categoryId === categoryId;
+                article.style.display = estVisible ? '' : 'none';
+                if (estVisible) {
+                    visibles++;
+                }
+            });
+
+            // Mise à jour du compteur (accord singulier/pluriel inclus)
+            const compteur = document.getElementById('compteur-articles');
+            compteur.textContent = visibles === 0
+                ? 'Aucun article affiché'
+                : `${visibles} article${visibles > 1 ? 's' : ''} affiché${visibles > 1 ? 's' : ''}`;
+
+            // Affichage du message si aucun résultat
+            document.getElementById('aucun-resultat').classList.toggle('hidden', visibles > 0);
+        }
+    </script>
 {% endblock %}

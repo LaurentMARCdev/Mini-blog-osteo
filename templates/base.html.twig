@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
 
     {# 
         Titre dynamique : chaque page peut surcharger le bloc "title".
         Le "|default" affiche "Blog Ostéopathie" si aucune page ne définit le bloc. 
     #}
     <title>{% block title %}Blog Ostéopathie{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Un blog dédié à l'histoire de l'ostéopathie, ses origines, ses figures marquantes et son évolution.{% endblock %}">
     {# Mise en place du script d'un bouton pour choisir le mode d'affichage clair/obscur #}
+    
     <script>
         (function () {
             // On stocke le choix sous la clé 'theme' avec valeur 'dark' ou 'light'

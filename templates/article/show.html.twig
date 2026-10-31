@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-
+{% block meta_description %}{{ article.extrait|striptags|slice(0, 155) }}{% endblock %}
 {% block title %}{{ article.titre }} — Blog Ostéopathie{% endblock %}
 
 {% block body %}
